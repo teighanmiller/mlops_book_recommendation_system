@@ -1,0 +1,2 @@
+data/open_ai_embeddings.csv filter=lfs diff=lfs merge=lfs -text
+data/books_1.Best_Books_Ever.csv filter=lfs diff=lfs merge=lfs -text
