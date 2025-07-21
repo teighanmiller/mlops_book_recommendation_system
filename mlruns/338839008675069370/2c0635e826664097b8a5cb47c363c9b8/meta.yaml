@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/338839008675069370/2c0635e826664097b8a5cb47c363c9b8/artifacts
+end_time: 1752802229286
+entry_point_name: ''
+experiment_id: '338839008675069370'
+lifecycle_stage: active
+run_id: 2c0635e826664097b8a5cb47c363c9b8
+run_name: lyrical-smelt-630
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1752802227983
+status: 4
+tags: []
+user_id: ubuntu

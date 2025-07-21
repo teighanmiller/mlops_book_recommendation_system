@@ -1,0 +1,6 @@
+artifact_location: mlflow-artifacts:/338839008675069370
+creation_time: 1752802203539
+experiment_id: '338839008675069370'
+last_update_time: 1752802203539
+lifecycle_stage: active
+name: book_clustering_experiment
