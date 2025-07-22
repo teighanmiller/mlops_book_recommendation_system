@@ -1,17 +1,24 @@
-import os
 import pandas as pd
+import argparse
 from sentence_transformers import SentenceTransformer
-from langchain_huggingface import HuggingFaceEmbeddings
-from clean_data import read_data
-from features import create_features
-from tqdm import tqdm
+from utility import get_from_s3, upload_to_s3
 
 def get_embeddings(data: str | list) -> list:
     model = SentenceTransformer('mixedbread-ai/mxbai-embed-large-v1')
     embeddings = model.encode(data)
     return embeddings
 
-def run_embedding_process(categorical: pd.DataFrame, numerical: pd.DataFrame):
+def run_embedding_process(input_path: str, output_path: str):
+    if input_path.startswith("s3://"):
+        _, bucket, *key_parts = input_path.split("/")
+        s3_key = "/".join(key_parts)
+        df = get_from_s3(bucket, s3_key)
+    else:
+        raise ValueError("Input path must start with s3://")
+
+    categorical = df['categorical']
+    numerical = df['scaled_percent', 'scaled_ratings']
+
     print("Getting embeddings......")
 
     if len(categorical) != len(numerical):
@@ -23,18 +30,25 @@ def run_embedding_process(categorical: pd.DataFrame, numerical: pd.DataFrame):
     emb_len = len(embeddings[-1])
 
     categorical_df = pd.DataFrame(embeddings)
-    numerical = pd.DataFrame(numerical)
     numerical.columns = [f"{emb_len + 1}", f"{emb_len + 2}"]
 
     embeddings_df = pd.concat([categorical_df, numerical], axis=1)
-    embeddings_df.to_csv("data/open_ai_embeddings.csv", index=False)
+
+    if output_path.startswith("s3://"):
+        _, bucket, *key_parts = output_path.split("/")
+        s3_key = "/".join(key_parts)
+        upload_to_s3(embeddings_df, bucket, s3_key)
+    else:
+        raise ValueError("Output path must start with s3://")
+
     print("Done creating embeddings.")
 
 # Works for testing 
 if __name__=="__main__":
-    filepath = r"/home/ubuntu/notebooks/mlops_book_recommendation_system/data/books_1.Best_Books_Ever.csv"
-    clean_df = read_data(filepath)
-    categorical, numerical = create_features(clean_df)
-    run_embedding_process(categorical, numerical)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input_path", "-i", type=str, required=True, help="s3://bucket-name/path/to/output.csv")
+    parser.add_argument("--output_path", "-o", type=str, required=True, help="s3://bucket-name/path/to/output.csv")
+    args = parser.parse_args()
+    run_embedding_process(args.input_path, args.output_path)
 
 
