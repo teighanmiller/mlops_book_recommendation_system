@@ -1,4 +1,6 @@
 import pandas as pd
+import argparse
+from utility import upload_to_s3
 
 def clean_genre(genre_str):
     genre_str = genre_str.replace("[", "")
@@ -10,7 +12,9 @@ def clean_author(author_str):
     pos = author_str.find("(")
     return author_str[:pos]
 
-def read_data(filepath):
+def read_data(output_path):
+    # THIS SHOULD BE REPLACED WITH A WEB DOWNLOAD
+    filepath = r"/home/ubuntu/notebooks/mlops_book_recommendation_system/data/books_1.Best_Books_Ever.csv"
     df = pd.read_csv(filepath, on_bad_lines='skip')
 
     print("Cleaning data.....")
@@ -24,11 +28,17 @@ def read_data(filepath):
     clean_df = clean_df.reset_index()
     clean_df = clean_df.drop(columns=['index'])
 
-    clean_df.to_csv("data/clean_books.csv")
-    return clean_df
+    if output_path.startswith("s3://"):
+        _, bucket, *key_parts = output_path.split("/")
+        s3_key = "/".join(key_parts)
+        upload_to_s3(clean_df, bucket, s3_key)
+    else:
+        raise ValueError("Ouput path must start with s3://")
 
 if __name__=="__main__":
-    filepath = r"/home/ubuntu/notebooks/mlops_book_recommendation_system/data/books_1.Best_Books_Ever.csv"
-    read_data(filepath=filepath)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--output_path", "-o", type=str, required=True, help="s3://bucket-name/path/to/output.csv")
+    args = parser.parse_args()
+    read_data(args.output_path)
 
     
