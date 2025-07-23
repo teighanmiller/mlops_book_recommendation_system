@@ -1,6 +1,10 @@
 import pandas as pd
 import argparse
+import requests
+from io import StringIO
 from utility import upload_to_s3
+
+CSV_URL="https://github.com/scostap/goodreads_bbe_dataset/raw/refs/heads/main/Best_Books_Ever_dataset/books_1.Best_Books_Ever.csv"
 
 def clean_genre(genre_str):
     genre_str = genre_str.replace("[", "")
@@ -12,10 +16,17 @@ def clean_author(author_str):
     pos = author_str.find("(")
     return author_str[:pos]
 
-def read_data(output_path):
-    # THIS SHOULD BE REPLACED WITH A WEB DOWNLOAD
-    filepath = r"/home/ubuntu/notebooks/mlops_book_recommendation_system/data/books_1.Best_Books_Ever.csv"
-    df = pd.read_csv(filepath, on_bad_lines='skip')
+def read_data() -> pd.DataFrame:
+    response = requests.get(CSV_URL)
+
+    if response.status_code == 200:
+        csv_data = StringIO(response.text)
+        return pd.read_csv(csv_data)
+    else:
+        print(f"Failed to retrieve CSV. Status code: {response.status_code}")
+
+def clean_data(output_path):
+    df = read_data()
 
     print("Cleaning data.....")
 
@@ -39,6 +50,7 @@ if __name__=="__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--output_path", "-o", type=str, required=True, help="s3://bucket-name/path/to/output.csv")
     args = parser.parse_args()
-    read_data(args.output_path)
+
+    clean_data(args.output_path)
 
     
