@@ -17,7 +17,7 @@ def run_embedding_process(input_path: str, output_path: str):
         raise ValueError("Input path must start with s3://")
 
     categorical = df['categorical']
-    numerical = df['scaled_percent', 'scaled_ratings']
+    numerical = df[['scaled_percent', 'scaled_ratings']]
 
     print("Getting embeddings......")
 
