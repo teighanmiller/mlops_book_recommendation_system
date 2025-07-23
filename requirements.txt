@@ -1,0 +1,13 @@
+sentence-transformers
+pandas
+airflow
+boto3
+dotenv
+langchain-huggingface
+mlflow
+numpy
+ollama
+openai
+pyarrow
+requests
+scikit-learn
