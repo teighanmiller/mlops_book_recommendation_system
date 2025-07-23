@@ -28,8 +28,6 @@ def read_data() -> pd.DataFrame:
 def clean_data(output_path):
     df = read_data()
 
-    print(df)
-
     print("Cleaning data.....")
 
     clean_df = df[["title", "author", "description", "genres", "likedPercent", "numRatings"]]
