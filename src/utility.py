@@ -6,7 +6,7 @@ def upload_to_s3(df: pd.DataFrame, bucket_name: str, s3_key: str):
     try:
         s3 = boto3.client("s3")
         buffer = BytesIO()
-        df.to_csv(buffer, index=False)
+        df.to_parquet(buffer, index=False)
         s3.put_object(Bucket=bucket_name, Key=s3_key, Body=buffer.getvalue())
     except Exception as e:
         print(f"An exception has occured during upload: {e}")
