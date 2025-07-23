@@ -1,14 +1,23 @@
-import pandas as pd
+"""
+This is the script to create embeddings using local embedding model.
+"""
 import argparse
+import pandas as pd
 from sentence_transformers import SentenceTransformer
 from utility import get_from_s3, upload_to_s3
 
 def get_embeddings(data: str | list) -> list:
+    """
+    Encodes data using mxbai large model
+    """
     model = SentenceTransformer('mixedbread-ai/mxbai-embed-large-v1')
     embeddings = model.encode(data)
     return embeddings
 
-def run_embedding_process(input_path: str, output_path: str):
+def run_embedding_process(input_path: str, output_path: str) -> None:
+    """
+    Runs the full embedding process including loading and writing data
+    """
     if input_path.startswith("s3://"):
         _, _, bucket, *key_parts = input_path.split("/")
         s3_key = "/".join(key_parts)
@@ -43,12 +52,19 @@ def run_embedding_process(input_path: str, output_path: str):
 
     print("Done creating embeddings.")
 
-# Works for testing 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input_path", "-i", type=str, required=True, help="s3://bucket-name/path/to/output.csv")
-    parser.add_argument("--output_path", "-o", type=str, required=True, help="s3://bucket-name/path/to/output.csv")
+    parser.add_argument("--input_path",
+                        "-i",
+                        type=str,
+                        required=True,
+                        help="s3://bucket-name/path/to/output.csv"
+                    )
+    parser.add_argument("--output_path",
+                        "-o",
+                        type=str,
+                        required=True,
+                        help="s3://bucket-name/path/to/output.csv"
+                    )
     args = parser.parse_args()
     run_embedding_process(args.input_path, args.output_path)
-
-

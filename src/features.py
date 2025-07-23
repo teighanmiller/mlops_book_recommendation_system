@@ -1,9 +1,15 @@
-import pandas as pd
+"""
+Script to create features for embedding
+"""
 import argparse
+import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 from utility import get_from_s3, upload_to_s3
 
 def create_features(input_path: str, output_path: str) -> None:
+    """
+    Creates features for embeddings from cleaned data. Gets and uploads data from s3.
+    """
 
     if input_path.startswith("s3://"):
         _, _, bucket, *key_parts = input_path.split("/")
@@ -14,10 +20,13 @@ def create_features(input_path: str, output_path: str) -> None:
 
     # Need to pass input path and file_key
     print("Creating Features.....")
-    categorical = "Title: " + df.title + " Author: " + df.author + " Description: " + df.description + " Genres: " + df.genres 
+    categorical = "Title: " + df.title \
+                + " Author: " + df.author \
+                + " Description: " + df.description \
+                + " Genres: " + df.genres
     categorical = pd.DataFrame(categorical, columns=['categorical'])
 
-    numerical = pd.DataFrame(df[['likedPercent', 'numRatings']]) 
+    numerical = pd.DataFrame(df[['likedPercent', 'numRatings']])
 
     # scale the numerical features
     scaler = MinMaxScaler()
@@ -35,7 +44,17 @@ def create_features(input_path: str, output_path: str) -> None:
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input_path", "-i", type=str, required=True, help="s3://bucket-name/path/to/output.csv")
-    parser.add_argument("--output_path", "-o", type=str, required=True, help="s3://bucket-name/path/to/output.csv")
+    parser.add_argument("--input_path",
+                        "-i",
+                        type=str,
+                        required=True,
+                        help="s3://bucket-name/path/to/output.csv"
+                    )
+    parser.add_argument("--output_path",
+                        "-o",
+                        type=str,
+                        required=True,
+                        help="s3://bucket-name/path/to/output.csv"
+                    )
     args = parser.parse_args()
     create_features(args.input_path, args.output_path)

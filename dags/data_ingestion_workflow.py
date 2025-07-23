@@ -1,5 +1,10 @@
-from airflow.sdk import DAG
+"""
+
+This is the DAG workflow for data ingestion in the book recommendations system project.
+
+"""
 from datetime import timedelta, datetime
+from airflow.sdk import DAG
 from airflow.providers.standard.operators.bash import BashOperator
 
 with DAG(
@@ -11,7 +16,8 @@ with DAG(
     "retry_delay": timedelta(minutes=5),
     },
 
-    description="DAG workflow for cleaning, feature engineering, embeddings, and clustering data for book recommendation system.",
+    description="DAG workflow for cleaning, feature engineering, embeddings, \
+        and clustering data for book recommendation system.",
     schedule=timedelta(days=1),
     start_date=datetime(2025, 7, 21),
     catchup=False,
@@ -22,7 +28,8 @@ with DAG(
         task_id="data_cleaning",
         bash_command=(
                 "python /opt/airflow/src/clean_data.py "
-                "--output_path s3://books-recommendation-storage/data/cleaned_{{ ds_nodash }}.parquet"
+                "--output_path s3://books-recommendation-storage/data \
+                    /cleaned_{{ ds_nodash }}.parquet"
             )
     )
 
@@ -40,8 +47,9 @@ with DAG(
         bash_command=(
             "python /opt/airflow/src/embeddings.py "
             "--input_path s3://books-recommendation-storage/data/feature_{{ ds_nodash }}.parquet "
-            "--output_path s3://books-recommendation-storage/data/embeddings_{{ ds_nodash }}.parquet"
+            "--output_path s3://books-recommendation-storage/data/ \
+                embeddings_{{ ds_nodash }}.parquet"
         )
     )
 
-    clean >> features >> embed
+    clean >> features >> embed # pylint: disable=pointless-statement

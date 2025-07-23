@@ -1,27 +1,39 @@
-import pandas as pd
-import boto3
+"""
+Utility functions for the mlops book recommendation system
+"""
 from io import BytesIO
+import boto3
+import botocore.exceptions
+import pandas as pd
 
-def upload_to_s3(df: pd.DataFrame, bucket_name: str, s3_key: str):
+def upload_to_s3(df: pd.DataFrame, bucket_name: str, s3_key: str) -> None:
+    """
+    Function to upload dataframe as a parquet to s3 bucket.
+    """
     try:
         s3 = boto3.client("s3")
         buffer = BytesIO()
         df.to_parquet(buffer, index=False)
         s3.put_object(Bucket=bucket_name, Key=s3_key, Body=buffer.getvalue())
-    except Exception as e:
+    except (botocore.exceptions.BotoCoreError, botocore.exceptions.ClientError, ValueError) as e:
         print(f"An exception has occured during upload: {e}")
 
-def get_from_s3(bucket_name: str, file_key: str):
+def get_from_s3(bucket_name: str, file_key: str) -> pd.DataFrame:
+    """
+    Function to download parquet from s3 bucket
+    """
     try:
         s3 = boto3.client("s3")
         response = s3.get_object(Bucket=bucket_name, Key=file_key)
         status_code = response['ResponseMetadata']['HTTPStatusCode']
         if status_code == 200:
             parquet_contents = BytesIO(response['Body'].read())
-            return pd.read_parquet(parquet_contents)
+            data = pd.read_parquet(parquet_contents)
         else:
             print(f"Error getting object: HTTP status code {status_code}")
             return None
-    except Exception as e:
+
+        return data
+    except (botocore.exceptions.BotoCoreError, botocore.exceptions.ClientError, ValueError) as e:
         print(f"An error ocurred: {e}")
         return None
