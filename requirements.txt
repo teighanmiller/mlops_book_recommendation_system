@@ -1,6 +1,5 @@
 sentence-transformers
 pandas
-airflow
 boto3
 dotenv
 langchain-huggingface
