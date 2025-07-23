@@ -10,7 +10,7 @@ def get_embeddings(data: str | list) -> list:
 
 def run_embedding_process(input_path: str, output_path: str):
     if input_path.startswith("s3://"):
-        _, bucket, *key_parts = input_path.split("/")
+        _, _, bucket, *key_parts = input_path.split("/")
         s3_key = "/".join(key_parts)
         df = get_from_s3(bucket, s3_key)
     else:
@@ -35,7 +35,7 @@ def run_embedding_process(input_path: str, output_path: str):
     embeddings_df = pd.concat([categorical_df, numerical], axis=1)
 
     if output_path.startswith("s3://"):
-        _, bucket, *key_parts = output_path.split("/")
+        _, _, bucket, *key_parts = output_path.split("/")
         s3_key = "/".join(key_parts)
         upload_to_s3(embeddings_df, bucket, s3_key)
     else:

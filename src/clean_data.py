@@ -28,6 +28,8 @@ def read_data() -> pd.DataFrame:
 def clean_data(output_path):
     df = read_data()
 
+    print(df)
+
     print("Cleaning data.....")
 
     clean_df = df[["title", "author", "description", "genres", "likedPercent", "numRatings"]]
@@ -40,7 +42,7 @@ def clean_data(output_path):
     clean_df = clean_df.drop(columns=['index'])
 
     if output_path.startswith("s3://"):
-        _, bucket, *key_parts = output_path.split("/")
+        _, _, bucket, *key_parts = output_path.split("/")
         s3_key = "/".join(key_parts)
         upload_to_s3(clean_df, bucket, s3_key)
     else:

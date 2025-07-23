@@ -6,7 +6,7 @@ from utility import get_from_s3, upload_to_s3
 def create_features(input_path: str, output_path: str) -> None:
 
     if input_path.startswith("s3://"):
-        _, bucket, *key_parts = input_path.split("/")
+        _, _, bucket, *key_parts = input_path.split("/")
         s3_key = "/".join(key_parts)
         df = get_from_s3(bucket, s3_key)
     else:
@@ -27,7 +27,7 @@ def create_features(input_path: str, output_path: str) -> None:
     data = pd.concat([categorical, numerical], axis=1)
 
     if output_path.startswith("s3://"):
-        _, bucket, *key_parts = output_path.split("/")
+        _, _, bucket, *key_parts = output_path.split("/")
         s3_key = "/".join(key_parts)
         upload_to_s3(data, bucket, s3_key)
     else:
