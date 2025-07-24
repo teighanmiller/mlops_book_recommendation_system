@@ -26,6 +26,8 @@ def clean_author(author_str: str) -> str:
     Removes unneeded characters from author data.
     """
     pos = author_str.find("(")
+    if pos < 0:
+        return author_str
     return author_str[:pos]
 
 def read_data() -> pd.DataFrame:
