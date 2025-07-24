@@ -40,6 +40,9 @@ def get_from_s3(bucket_name: str, file_key: str) -> pd.DataFrame:
         return None
 
 def parse_io_args():
+    """
+    Argument parser for input and output files
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("--input_path",
                         "-i",
@@ -54,4 +57,4 @@ def parse_io_args():
                         help="s3://bucket-name/path/to/output.csv"
                     )
     return parser.parse_args()
-    
+ 

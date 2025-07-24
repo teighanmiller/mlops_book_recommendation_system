@@ -8,7 +8,7 @@ from sklearn.metrics import silhouette_score
 import mlflow
 import mlflow.sklearn
 from mlflow.models import infer_signature
-from utility import get_from_s3
+from src.utility import get_from_s3
 
 mlflow.set_tracking_uri("http://localhost:5000")
 mlflow.set_experiment("book_clustering_experiment")

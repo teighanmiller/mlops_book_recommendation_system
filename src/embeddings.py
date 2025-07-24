@@ -3,7 +3,7 @@ This is the script to create embeddings using local embedding model.
 """
 import pandas as pd
 from sentence_transformers import SentenceTransformer
-from utility import get_from_s3, upload_to_s3, parse_io_args
+from src.utility import get_from_s3, upload_to_s3, parse_io_args
 
 def get_embeddings(data: str | list) -> list:
     """
@@ -52,5 +52,5 @@ def run_embedding_process(input_path: str, output_path: str) -> None:
     print("Done creating embeddings.")
 
 if __name__=="__main__":
-    args = parse_io_args() 
+    args = parse_io_args()
     run_embedding_process(args.input_path, args.output_path)

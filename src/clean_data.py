@@ -7,7 +7,7 @@ import argparse
 from io import StringIO
 import requests
 import pandas as pd
-from utility import upload_to_s3
+from src.utility import upload_to_s3
 
 CSV_URL="https://github.com/scostap/goodreads_bbe_dataset/raw/refs/heads/main/ \
     Best_Books_Ever_dataset/books_1.Best_Books_Ever.csv"
