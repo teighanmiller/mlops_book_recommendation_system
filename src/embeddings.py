@@ -9,7 +9,7 @@ def get_embeddings(data: str | list) -> list:
     """
     Encodes data using mxbai large model
     """
-    model = SentenceTransformer('mixedbread-ai/mxbai-embed-large-v1')
+    model = SentenceTransformer('mixedbread-ai/mxbai-embed-xsmall-v1')
     embeddings = model.encode(data)
     return embeddings
 
