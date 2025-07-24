@@ -73,4 +73,11 @@ def parse_io_args():
                         help="initial state of clusters"
                     )
     return parser.parse_args()
- 
+
+def check_io_args(args):
+    if not args.input_path:
+        raise ValueError("You must provide --input_path")
+    
+    if not args.output_path:
+        raise ValueError("You must provide --ouput_path")
+

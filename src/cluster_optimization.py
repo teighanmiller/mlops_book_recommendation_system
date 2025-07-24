@@ -8,7 +8,7 @@ from sklearn.metrics import silhouette_score
 import mlflow
 import mlflow.sklearn
 from mlflow.models import infer_signature
-from src.utility import get_from_s3, parse_io_args
+from src.utility import get_from_s3, parse_io_args, check_io_args
 
 mlflow.set_tracking_uri("http://localhost:5000")
 mlflow.set_experiment("book_clustering_experiment")
@@ -62,11 +62,7 @@ def optimize(input_path: str, in_params: dict):
 if __name__=="__main__":
     args = parse_io_args()
 
-    if not args.input_path:
-        raise ValueError("You must provide --input_path")
-    
-    if not args.output_path:
-        raise ValueError("You must provide --ouput_path")
+    check_io_args(args)
 
     # Need to add conditions if parameters are empty
     arg_params = {

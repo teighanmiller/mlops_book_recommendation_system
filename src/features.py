@@ -3,7 +3,7 @@ Script to create features for embedding
 """
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
-from src.utility import get_from_s3, upload_to_s3, parse_io_args
+from src.utility import get_from_s3, upload_to_s3, parse_io_args, check_io_args
 
 def create_features(input_path: str, output_path: str) -> None:
     """
@@ -44,10 +44,6 @@ def create_features(input_path: str, output_path: str) -> None:
 if __name__=="__main__":
     args = parse_io_args()
 
-    if not args.input_path:
-        raise ValueError("You must provide --input_path")
-    
-    if not args.output_path:
-        raise ValueError("You must provide --ouput_path")
-        
+    check_io_args(args)
+
     create_features(args.input_path, args.output_path)
