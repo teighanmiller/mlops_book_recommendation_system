@@ -1,10 +1,9 @@
 """
 Script to create features for embedding
 """
-import argparse
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
-from utility import get_from_s3, upload_to_s3
+from utility import get_from_s3, upload_to_s3, parse_io_args
 
 def create_features(input_path: str, output_path: str) -> None:
     """
@@ -43,18 +42,5 @@ def create_features(input_path: str, output_path: str) -> None:
         raise ValueError("Output path must start with s3://")
 
 if __name__=="__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--input_path",
-                        "-i",
-                        type=str,
-                        required=True,
-                        help="s3://bucket-name/path/to/output.csv"
-                    )
-    parser.add_argument("--output_path",
-                        "-o",
-                        type=str,
-                        required=True,
-                        help="s3://bucket-name/path/to/output.csv"
-                    )
-    args = parser.parse_args()
+    args = parse_io_args()
     create_features(args.input_path, args.output_path)

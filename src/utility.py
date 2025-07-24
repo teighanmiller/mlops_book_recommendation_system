@@ -1,6 +1,7 @@
 """
 Utility functions for the mlops book recommendation system
 """
+import argparse
 from io import BytesIO
 import boto3
 import botocore.exceptions
@@ -37,3 +38,20 @@ def get_from_s3(bucket_name: str, file_key: str) -> pd.DataFrame:
     except (botocore.exceptions.BotoCoreError, botocore.exceptions.ClientError, ValueError) as e:
         print(f"An error ocurred: {e}")
         return None
+
+def parse_io_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input_path",
+                        "-i",
+                        type=str,
+                        required=True,
+                        help="s3://bucket-name/path/to/output.csv"
+                    )
+    parser.add_argument("--output_path",
+                        "-o",
+                        type=str,
+                        required=True,
+                        help="s3://bucket-name/path/to/output.csv"
+                    )
+    return parser.parse_args()
+    
