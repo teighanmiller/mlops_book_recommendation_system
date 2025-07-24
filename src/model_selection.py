@@ -1,18 +1,17 @@
-import mlflow
+"""
+Files for model selection and upload
+"""
 import argparse
+import mlflow
 from utility import upload_to_s3
 
 mlflow.set_tracking_uri("http://localhost:5000")
 mlflow.set_experiment("book_clustering_experiment")
 
 def select_model(output_path: str):
-    top_models = mlflow.search_logged_models(
-        experimet_ids=["1", "2"],
-        filter_string = "metrics.silhouette_score > 0.70",
-        order_by=[{"field_name": "metrics.silhouette_score", "ascending": False}],
-        max_results = 5,
-    )
-
+    """
+    Seaches mlflow logs for best cluster model and uploads it.
+    """
     best_model = mlflow.search_logged_models(
         experiment_ids=["1"],
         filter_string = "metrics.silhouette_score > 0.70",
@@ -33,6 +32,12 @@ def select_model(output_path: str):
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--output_path", "-o", type=str, required=True, help="s3://bucket-name/path/to/output.csv")
+    parser.add_argument(
+        "--output_path",
+        "-o", 
+        type=str,
+        required=True,
+        help="s3://bucket-name/path/to/output.csv"
+    )
     args = parser.parse_args()
     select_model(args.output_path)
