@@ -10,3 +10,4 @@ openai
 pyarrow
 requests
 scikit-learn
+apache-airflow
