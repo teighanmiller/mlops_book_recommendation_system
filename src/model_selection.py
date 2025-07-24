@@ -1,9 +1,8 @@
 """
 Files for model selection and upload
 """
-import argparse
 import mlflow
-from utility import upload_to_s3
+from utility import upload_to_s3, parse_io_args
 
 mlflow.set_tracking_uri("http://localhost:5000")
 mlflow.set_experiment("book_clustering_experiment")
@@ -31,13 +30,9 @@ def select_model(output_path: str):
         raise ValueError("Output path must start with s3://")
 
 if __name__=="__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--output_path",
-        "-o", 
-        type=str,
-        required=True,
-        help="s3://bucket-name/path/to/output.csv"
-    )
-    args = parser.parse_args()
+    args = parse_io_args()
+
+    if not args.output_path:
+        raise ValueError("You must provide --output_path")
+
     select_model(args.output_path)

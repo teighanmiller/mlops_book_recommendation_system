@@ -8,7 +8,7 @@ from sklearn.metrics import silhouette_score
 import mlflow
 import mlflow.sklearn
 from mlflow.models import infer_signature
-from src.utility import get_from_s3
+from src.utility import get_from_s3, parse_io_args
 
 mlflow.set_tracking_uri("http://localhost:5000")
 mlflow.set_experiment("book_clustering_experiment")
@@ -60,38 +60,13 @@ def optimize(input_path: str, in_params: dict):
         cluster_kmeans(data, in_params)
 
 if __name__=="__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--input_path",
-                        "-i",
-                        type=str,
-                        required=True,
-                        help="s3://bucket-name/path/to/output.csv"
-                    )
-    parser.add_argument("--output_path",
-                        "-o",
-                        type=str,
-                        required=True,
-                        help="s3://bucket-name/path/to/output.csv"
-                    )
-    parser.add_argument("--min_clusters",
-                        "-m",
-                        type=int,
-                        required=False,
-                        help="minimum number of clusters to check"
-                    )
-    parser.add_argument("--max_clusters",
-                        "-x",
-                        type=int,
-                        required=False,
-                        help="maximum number of clusters to check"
-                    )
-    parser.add_argument("--random_state",
-                        "-r",
-                        type=int,
-                        required=False,
-                        help="initial state of clusters"
-                    )
-    args = parser.parse_args()
+    args = parse_io_args()
+
+    if not args.input_path:
+        raise ValueError("You must provide --input_path")
+    
+    if not args.output_path:
+        raise ValueError("You must provide --ouput_path")
 
     # Need to add conditions if parameters are empty
     arg_params = {

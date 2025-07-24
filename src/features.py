@@ -43,4 +43,11 @@ def create_features(input_path: str, output_path: str) -> None:
 
 if __name__=="__main__":
     args = parse_io_args()
+
+    if not args.input_path:
+        raise ValueError("You must provide --input_path")
+    
+    if not args.output_path:
+        raise ValueError("You must provide --ouput_path")
+        
     create_features(args.input_path, args.output_path)

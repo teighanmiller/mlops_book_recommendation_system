@@ -47,14 +47,30 @@ def parse_io_args():
     parser.add_argument("--input_path",
                         "-i",
                         type=str,
-                        required=True,
                         help="s3://bucket-name/path/to/output.csv"
                     )
     parser.add_argument("--output_path",
                         "-o",
                         type=str,
-                        required=True,
                         help="s3://bucket-name/path/to/output.csv"
+                    )
+    parser.add_argument("--min_clusters",
+                        "-m",
+                        type=int,
+                        default=2,
+                        help="minimum number of clusters to check"
+                    )
+    parser.add_argument("--max_clusters",
+                        "-x",
+                        type=int,
+                        default=50,
+                        help="maximum number of clusters to check"
+                    )
+    parser.add_argument("--random_state",
+                        "-r",
+                        type=int,
+                        default=42,
+                        help="initial state of clusters"
                     )
     return parser.parse_args()
  

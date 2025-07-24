@@ -7,7 +7,7 @@ import argparse
 from io import StringIO
 import requests
 import pandas as pd
-from src.utility import upload_to_s3
+from src.utility import upload_to_s3, parse_io_args
 
 CSV_URL="https://github.com/scostap/goodreads_bbe_dataset/raw/refs/heads/main/ \
     Best_Books_Ever_dataset/books_1.Best_Books_Ever.csv"
@@ -69,13 +69,9 @@ def clean_data(output_path: str) -> None:
         raise ValueError("Ouput path must start with s3://")
 
 if __name__=="__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--output_path",
-                        "-o",
-                        type=str,
-                        required=True,
-                        help="s3://bucket-name/path/to/output.csv"
-                    )
-    args = parser.parse_args()
+    args = parse_io_args()
+
+    if not args.output_path:
+        raise ValueError("You must provide --output_path")
 
     clean_data(args.output_path)
