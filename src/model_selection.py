@@ -2,7 +2,7 @@
 Files for model selection and upload
 """
 import mlflow
-from utility import upload_to_s3, parse_io_args
+from src.utility import write_data, parse_io_args
 
 mlflow.set_tracking_uri("http://localhost:5000")
 mlflow.set_experiment("book_clustering_experiment")
@@ -21,14 +21,8 @@ def select_model(output_path: str):
 
     loaded_model = mlflow.pyfunc.load_model(f"models:/{best_model.model_id}")
 
-    if output_path.startswith("s3://"):
-        _, _, bucket, *key_parts = output_path.split("/")
-        s3_key = "/".join(key_parts)
-        ## SHOULD CHANGE THIS TO ACCEPT MODEL NOT PARQUET
-        upload_to_s3(loaded_model, bucket, s3_key)
-    else:
-        raise ValueError("Output path must start with s3://")
-
+    write_data(loaded_model, output_path)
+    
 if __name__=="__main__":
     args = parse_io_args()
 

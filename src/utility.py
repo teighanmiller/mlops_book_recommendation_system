@@ -7,6 +7,23 @@ import boto3
 import botocore.exceptions
 import pandas as pd
 
+def get_data(input_path: str) -> pd.DataFrame:
+    if input_path.startswith("s3://"):
+        _, _, bucket, *key_parts = input_path.split("/")
+        s3_key = "/".join(key_parts)
+        df = get_from_s3(bucket, s3_key)
+    else:
+        raise ValueError("Input path must start with s3://")
+    return df
+
+def write_data(data, output_path: str) -> None:
+    if output_path.startswith("s3://"):
+        _, _, bucket, *key_parts = output_path.split("/")
+        s3_key = "/".join(key_parts)
+        upload_to_s3(data, bucket, s3_key)
+    else:
+        raise ValueError("Output path must start with s3://")
+
 def upload_to_s3(df: pd.DataFrame, bucket_name: str, s3_key: str) -> None:
     """
     Function to upload dataframe as a parquet to s3 bucket.
@@ -75,9 +92,11 @@ def parse_io_args():
     return parser.parse_args()
 
 def check_io_args(args):
+    """
+    Checks if input_path and output_path are present in args
+    """
     if not args.input_path:
         raise ValueError("You must provide --input_path")
-    
+ 
     if not args.output_path:
         raise ValueError("You must provide --ouput_path")
-

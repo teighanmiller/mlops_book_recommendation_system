@@ -3,21 +3,12 @@ Script to create features for embedding
 """
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
-from src.utility import get_from_s3, upload_to_s3, parse_io_args, check_io_args
+from src.utility import get_data, write_data, parse_io_args, check_io_args
 
-def create_features(input_path: str, output_path: str) -> None:
+def create_features(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Creates features for embeddings from cleaned data. Gets and uploads data from s3.
+    Takes raw data and creates features
     """
-
-    if input_path.startswith("s3://"):
-        _, _, bucket, *key_parts = input_path.split("/")
-        s3_key = "/".join(key_parts)
-        df = get_from_s3(bucket, s3_key)
-    else:
-        raise ValueError("Input path must start with s3://")
-
-    # Need to pass input path and file_key
     print("Creating Features.....")
     categorical = "Title: " + df.title \
                 + " Author: " + df.author \
@@ -34,16 +25,21 @@ def create_features(input_path: str, output_path: str) -> None:
 
     data = pd.concat([categorical, numerical], axis=1)
 
-    if output_path.startswith("s3://"):
-        _, _, bucket, *key_parts = output_path.split("/")
-        s3_key = "/".join(key_parts)
-        upload_to_s3(data, bucket, s3_key)
-    else:
-        raise ValueError("Output path must start with s3://")
+    return data
+
+def get_features(input_path: str, output_path: str) -> None:
+    """
+    Creates features for embeddings from cleaned data. Gets and uploads data from s3.
+    """
+    df = get_data(input_path)
+
+    data = create_features(df)
+
+    write_data(data, output_path)
 
 if __name__=="__main__":
     args = parse_io_args()
 
     check_io_args(args)
 
-    create_features(args.input_path, args.output_path)
+    get_features(args.input_path, args.output_path)

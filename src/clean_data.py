@@ -3,11 +3,10 @@
 This is the script for cleaning data before feature engineering and embedding processes are applied.
 
 """
-import argparse
 from io import StringIO
 import requests
 import pandas as pd
-from src.utility import upload_to_s3, parse_io_args
+from src.utility import write_data, parse_io_args
 
 CSV_URL="https://github.com/scostap/goodreads_bbe_dataset/raw/refs/heads/main/ \
     Best_Books_Ever_dataset/books_1.Best_Books_Ever.csv"
@@ -61,13 +60,8 @@ def clean_data(output_path: str) -> None:
     clean_df = clean_df.reset_index()
     clean_df = clean_df.drop(columns=['index'])
 
-    if output_path.startswith("s3://"):
-        _, _, bucket, *key_parts = output_path.split("/")
-        s3_key = "/".join(key_parts)
-        upload_to_s3(clean_df, bucket, s3_key)
-    else:
-        raise ValueError("Ouput path must start with s3://")
-
+    write_data(clean_df, output_path)
+    
 if __name__=="__main__":
     args = parse_io_args()
 

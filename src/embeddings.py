@@ -3,9 +3,9 @@ This is the script to create embeddings using local embedding model.
 """
 import pandas as pd
 from sentence_transformers import SentenceTransformer
-from src.utility import get_from_s3, upload_to_s3, parse_io_args, check_io_args
+from src.utility import get_data, write_data, parse_io_args, check_io_args
 
-def get_embeddings(data: str | list) -> list:
+def create_embeddings(data: str | list) -> list:
     """
     Encodes data using mxbai large model
     """
@@ -13,17 +13,10 @@ def get_embeddings(data: str | list) -> list:
     embeddings = model.encode(data)
     return embeddings
 
-def run_embedding_process(input_path: str, output_path: str) -> None:
+def get_embeddings(df: pd.DataFrame) -> None:
     """
-    Runs the full embedding process including loading and writing data
+    Seperates numeric and text data. Scales numeric data and embeds text data.
     """
-    if input_path.startswith("s3://"):
-        _, _, bucket, *key_parts = input_path.split("/")
-        s3_key = "/".join(key_parts)
-        df = get_from_s3(bucket, s3_key)
-    else:
-        raise ValueError("Input path must start with s3://")
-
     categorical = df['categorical']
     numerical = df[['scaled_percent', 'scaled_ratings']]
 
@@ -34,7 +27,7 @@ def run_embedding_process(input_path: str, output_path: str) -> None:
 
     categorical_list = categorical.values.tolist()
 
-    embeddings = get_embeddings(categorical_list)
+    embeddings = create_embeddings(categorical_list)
     emb_len = len(embeddings[-1])
 
     categorical_df = pd.DataFrame(embeddings)
@@ -42,13 +35,17 @@ def run_embedding_process(input_path: str, output_path: str) -> None:
 
     embeddings_df = pd.concat([categorical_df, numerical], axis=1)
 
-    if output_path.startswith("s3://"):
-        _, _, bucket, *key_parts = output_path.split("/")
-        s3_key = "/".join(key_parts)
-        upload_to_s3(embeddings_df, bucket, s3_key)
-    else:
-        raise ValueError("Output path must start with s3://")
+    return embeddings_df
 
+def run_embedding_process(input_path: str, output_path: str) -> None:
+    """
+    Runs the full embedding process including loading and writing data.
+    """
+    df = get_data(input_path)
+
+    embeddings = get_embeddings(df)
+
+    write_data(embeddings, output_path)
     print("Done creating embeddings.")
 
 if __name__=="__main__":
