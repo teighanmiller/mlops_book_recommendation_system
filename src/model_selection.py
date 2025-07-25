@@ -22,7 +22,7 @@ def select_model(output_path: str):
     loaded_model = mlflow.pyfunc.load_model(f"models:/{best_model.model_id}")
 
     write_data(loaded_model, output_path)
-    
+
 if __name__=="__main__":
     args = parse_io_args()
 
