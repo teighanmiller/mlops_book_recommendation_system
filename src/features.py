@@ -33,9 +33,11 @@ def get_features(input_path: str, output_path: str) -> None:
     """
     df = get_data(input_path)
 
-    data = create_features(df)
+    feature_df = create_features(df)
+    data = pd.concat([df[['title', 'author', 'description', 'genres']], feature_df], axis=1)
 
     write_data(data, output_path)
+    print("Finished.")
 
 if __name__=="__main__":
     args = parse_io_args()
