@@ -10,4 +10,6 @@ openai
 pyarrow
 requests
 scikit-learn
-apache-airflow
+apache-airflow-task-sdk
+pylint
+black
