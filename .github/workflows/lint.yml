@@ -16,7 +16,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install Dependancies
-        run: pip install black pylint
+        run: pip install -r requirements.txt
 
       - name: Run Black to auto-format code
         run: black .
