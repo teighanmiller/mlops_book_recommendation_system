@@ -7,7 +7,7 @@ from sklearn.metrics import silhouette_score
 import mlflow
 import mlflow.sklearn
 from mlflow.models import infer_signature
-from src.utility import get_from_s3, parse_io_args, check_io_args
+from src.utility import get_data, parse_io_args, check_io_args
 
 mlflow.set_tracking_uri("http://localhost:5000")
 mlflow.set_experiment("book_clustering_experiment")
@@ -48,12 +48,7 @@ def optimize(input_path: str, in_params: dict):
     """
     Loads data and performs clustering over a range of k values.
     """
-    if input_path.startswith("s3://"):
-        _, _, bucket, *key_parts = input_path.split("/")
-        s3_key = "/".join(key_parts)
-        data = get_from_s3(bucket, s3_key)
-    else:
-        raise ValueError("Output path must start with s3://")
+    data = get_data(input_path)
 
     for _ in range(in_params['min_clusters'], in_params['max_clusters'] + 1, 2):
         cluster_kmeans(data, in_params)
