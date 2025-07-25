@@ -61,7 +61,7 @@ def clean_data(output_path: str) -> None:
     clean_df = clean_df.drop(columns=['index'])
 
     write_data(clean_df, output_path)
-    
+
 if __name__=="__main__":
     args = parse_io_args()
 

@@ -8,6 +8,9 @@ import botocore.exceptions
 import pandas as pd
 
 def get_data(input_path: str) -> pd.DataFrame:
+    """
+    Parse input_path for retrieval from s3 bucket
+    """
     if input_path.startswith("s3://"):
         _, _, bucket, *key_parts = input_path.split("/")
         s3_key = "/".join(key_parts)
@@ -17,6 +20,9 @@ def get_data(input_path: str) -> pd.DataFrame:
     return df
 
 def write_data(data, output_path: str) -> None:
+    """
+    Parse output_path for uploading data to s3 bucket
+    """
     if output_path.startswith("s3://"):
         _, _, bucket, *key_parts = output_path.split("/")
         s3_key = "/".join(key_parts)

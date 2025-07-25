@@ -1,7 +1,6 @@
 """
 This is the code file for finding the best cluster parameters.
 """
-import argparse
 import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
