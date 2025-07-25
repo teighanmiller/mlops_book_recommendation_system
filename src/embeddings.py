@@ -43,9 +43,11 @@ def run_embedding_process(input_path: str, output_path: str) -> None:
     """
     df = get_data(input_path)
 
-    embeddings = get_embeddings(df)
+    # TODO: No need to pass all this data.
+    embeddings = get_embeddings(df[['categorical', 'scaled_percent', 'scaled_ratings']])
+    full_df = pd.concat([df[['title', 'author', 'description', 'genres']], embeddings], axis=1)
 
-    write_data(embeddings, output_path)
+    write_data(full_df, output_path)
     print("Done creating embeddings.")
 
 if __name__=="__main__":
