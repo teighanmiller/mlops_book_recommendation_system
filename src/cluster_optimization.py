@@ -12,7 +12,7 @@ from src.utility import get_data, parse_io_args
 mlflow.set_tracking_uri("http://localhost:5000")
 mlflow.set_experiment("book_clustering_experiment")
 
-def cluster_kmeans(data: pd.Dataframe, in_params: dict):
+def cluster_kmeans(data: pd.DataFrame, in_params: dict):
     """
     Performs clustering using KMeans
     """
