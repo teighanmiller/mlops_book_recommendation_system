@@ -3,6 +3,8 @@ Backend for book recommendation application
 """
 from flask import Flask, request, render_template, session
 from flask_session import Session
+from search import run_search
+from utility import get_data
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "your_secret_key_here"
@@ -24,12 +26,17 @@ def search():
     """
     Search webpage
     """
+    data = get_data("s3://books-recommendation-storage/data/cleaned_test.parquet")
     results = []
     if request.method == "POST":
         query = request.form.get("query", "")
-        results = mock_search(query)
+        index_results = run_search(
+            "s3://books-recommendation-storage/data/corpus_test.parquet", query
+        )
+        search_results = data.loc[index_results]
+        results = search_results["title"].to_list()
+        print(results)
         session["last_query"] = query
-        session["last_results"] = results
     return render_template("search.html", results=enumerate(results))
 
 
@@ -58,4 +65,4 @@ def related_search(parent_id, related_id):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0", port=5000)

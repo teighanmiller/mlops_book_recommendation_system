@@ -47,6 +47,13 @@ def tokenize_corpus(df: pd.Series):
     return df.apply(tokenize_text)
 
 
+def lower_text(text: str):
+    """
+    Turns all text to lowercase
+    """
+    return text.lower()
+
+
 def prepare_corpus(input_file: str, output_file: str):
     """
     Create data set for search
@@ -62,12 +69,18 @@ def prepare_corpus(input_file: str, output_file: str):
     except Exception as e:
         raise ValueError(f"An error has occured: {e}") from e
 
+    print("Making all text lowercase....")
+    msg_corpus.apply(lower_text)
+
     print("Removing special characters....")
     msg_corpus.apply(remove_special_characters)
+
     print("Removing stopword....")
     msg_corpus.apply(lambda x: remove_stopwords(x, nlp))
+
     print("Stemming words....")
     msg_corpus.apply(stem_words)
+
     print("Tokenizing text....")
     msg_corpus.apply(tokenize_text)
     tokenized_corpus = tokenize_corpus(msg_corpus)
