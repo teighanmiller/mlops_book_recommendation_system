@@ -16,3 +16,6 @@ black
 pytest
 pre-commit
 faiss-cpu
+rank_bm25
+spacy
+nltk
