@@ -105,6 +105,13 @@ def parse_io_args():
     parser.add_argument(
         "--random_state", "-r", type=int, default=42, help="initial state of clusters"
     )
+    parser.add_argument(
+        "--niter",
+        "-n",
+        type=int,
+        default=20,
+        help="iterations run for kmeans clustering model",
+    )
     return parser.parse_args()
 
 

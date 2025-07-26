@@ -2,11 +2,10 @@
 This is the code file for finding the best cluster parameters.
 """
 
+import numpy as np
 import mlflow
-import mlflow.sklearn
-import pandas as pd
 from mlflow.models import infer_signature
-from sklearn.cluster import KMeans
+from faiss import Kmeans
 from sklearn.metrics import silhouette_score
 
 from src.utility import get_data, parse_io_args
@@ -15,28 +14,33 @@ mlflow.set_tracking_uri("http://localhost:5000")
 mlflow.set_experiment("book_clustering_experiment")
 
 
-def cluster_kmeans(data: pd.DataFrame, in_params: dict):
+def cluster_kmeans(data: np.ndarray, in_params: dict):
     """
     Performs clustering using KMeans
     """
     with mlflow.start_run():
 
         params = {
-            "n_clusters": in_params["n_clusters"],
+            "d": data.shape[1],
+            "n_centroids": in_params["n_clusters"],
+            "niter": in_params["niter"],
             "random_state": in_params["random_state"],
+            "verbose": True,
+            "spherical": True,
         }
 
-        kmeans = KMeans(**params, n_init="auto").fit(X=data)
-        labels = kmeans.predict(X=data)
+        kmeans = Kmeans(**params)
+        kmeans.train(data)
+        _, labels = kmeans.index.search(data, k=1)
         sil_score = silhouette_score(X=data, labels=labels)
 
         mlflow.log_params(params)
-        mlflow.log_metric("silhouette_score", sil_score)
+        mlflow.log_metrics("silhouette_score", sil_score)
 
         signature = infer_signature(data, labels)
 
-        model_info = mlflow.sklearn.log_model(
-            sk_model=KMeans,
+        model_info = mlflow.pyfunc.load_model(
+            sk_model=Kmeans,
             name="book_clustering",
             signature=signature,
             input_example=data[:10],
@@ -45,7 +49,7 @@ def cluster_kmeans(data: pd.DataFrame, in_params: dict):
         mlflow.set_logged_model_tags(
             model_info.model_id,
             {
-                "model_type": "kmeans",
+                "model_type": "fiass-kmeans",
                 "stage": "clustered",
                 "Training Info": "Test Kmeans clustering model for book recommedation system.",
             },
@@ -56,7 +60,7 @@ def optimize(input_path: str, in_params: dict):
     """
     Loads data and performs clustering over a range of k values.
     """
-    data = get_data(input_path)
+    data = get_data(input_path).to_numpy()
 
     for k in range(in_params["min_clusters"], in_params["max_clusters"] + 1, 2):
         in_params["n_clusters"] = k
@@ -73,6 +77,7 @@ if __name__ == "__main__":
         "min_clusters": args.min_clusters,
         "max_clusters": args.max_clusters,
         "random_state": args.random_state,
+        "niter": args.niter,
     }
 
     optimize(args.input_path, arg_params)
