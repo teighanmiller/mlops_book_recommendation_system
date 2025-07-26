@@ -103,9 +103,6 @@ def parse_io_args():
         help="maximum number of clusters to check",
     )
     parser.add_argument(
-        "--random_state", "-r", type=int, default=42, help="initial state of clusters"
-    )
-    parser.add_argument(
         "--niter",
         "-n",
         type=int,

@@ -21,9 +21,8 @@ def cluster_kmeans(data: np.ndarray, in_params: dict):
 
         params = {
             "d": data.shape[1],
-            "n_centroids": in_params["n_clusters"],
+            "k": in_params["n_clusters"],
             "niter": in_params["niter"],
-            "random_state": in_params["random_state"],
             "verbose": True,
             "spherical": True,
         }
@@ -57,7 +56,6 @@ if __name__ == "__main__":
     arg_params = {
         "min_clusters": args.min_clusters,
         "max_clusters": args.max_clusters,
-        "random_state": args.random_state,
         "niter": args.niter,
     }
 
