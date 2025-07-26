@@ -13,3 +13,5 @@ scikit-learn
 apache-airflow-task-sdk
 pylint
 black
+pytest
+pre-commit

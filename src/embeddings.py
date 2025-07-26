@@ -1,24 +1,28 @@
 """
 This is the script to create embeddings using local embedding model.
 """
+
 import pandas as pd
 from sentence_transformers import SentenceTransformer
-from src.utility import get_data, write_data, parse_io_args, check_io_args
+
+from src.utility import check_io_args, get_data, parse_io_args, write_data
+
 
 def create_embeddings(data: str | list) -> list:
     """
     Encodes data using mxbai large model
     """
-    model = SentenceTransformer('mixedbread-ai/mxbai-embed-xsmall-v1')
+    model = SentenceTransformer("mixedbread-ai/mxbai-embed-xsmall-v1")
     embeddings = model.encode(data)
     return embeddings
+
 
 def get_embeddings(df: pd.DataFrame) -> None:
     """
     Seperates numeric and text data. Scales numeric data and embeds text data.
     """
-    categorical = df['categorical']
-    numerical = df[['scaled_percent', 'scaled_ratings']]
+    categorical = df["categorical"]
+    numerical = df[["scaled_percent", "scaled_ratings"]]
 
     print("Getting embeddings......")
 
@@ -37,20 +41,24 @@ def get_embeddings(df: pd.DataFrame) -> None:
 
     return embeddings_df
 
+
 def run_embedding_process(input_path: str, output_path: str) -> None:
     """
     Runs the full embedding process including loading and writing data.
     """
     df = get_data(input_path)
 
-    # TODO: No need to pass all this data.
-    embeddings = get_embeddings(df[['categorical', 'scaled_percent', 'scaled_ratings']])
-    full_df = pd.concat([df[['title', 'author', 'description', 'genres']], embeddings], axis=1)
+    # No need to pass all this data.
+    embeddings = get_embeddings(df[["categorical", "scaled_percent", "scaled_ratings"]])
+    full_df = pd.concat(
+        [df[["title", "author", "description", "genres"]], embeddings], axis=1
+    )
 
     write_data(full_df, output_path)
     print("Done creating embeddings.")
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     args = parse_io_args()
 
     check_io_args(args)

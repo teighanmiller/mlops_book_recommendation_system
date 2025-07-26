@@ -1,16 +1,19 @@
 """
 This is the code file for finding the best cluster parameters.
 """
-import pandas as pd
-from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score
+
 import mlflow
 import mlflow.sklearn
+import pandas as pd
 from mlflow.models import infer_signature
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+
 from src.utility import get_data, parse_io_args
 
 mlflow.set_tracking_uri("http://localhost:5000")
 mlflow.set_experiment("book_clustering_experiment")
+
 
 def cluster_kmeans(data: pd.DataFrame, in_params: dict):
     """
@@ -19,8 +22,8 @@ def cluster_kmeans(data: pd.DataFrame, in_params: dict):
     with mlflow.start_run():
 
         params = {
-            "n_clusters": in_params['n_clusters'],
-            'random_state': in_params['random_state']
+            "n_clusters": in_params["n_clusters"],
+            "random_state": in_params["random_state"],
         }
 
         kmeans = KMeans(**params, n_init="auto").fit(X=data)
@@ -34,15 +37,20 @@ def cluster_kmeans(data: pd.DataFrame, in_params: dict):
 
         model_info = mlflow.sklearn.log_model(
             sk_model=KMeans,
-            name='book_clustering',
+            name="book_clustering",
             signature=signature,
             input_example=data[:10],
         )
 
         mlflow.set_logged_model_tags(
             model_info.model_id,
-            {"model_type": "kmeans", "stage": "clustered", "Training Info": "Test Kmeans clustering model for book recommedation system."}
+            {
+                "model_type": "kmeans",
+                "stage": "clustered",
+                "Training Info": "Test Kmeans clustering model for book recommedation system.",
+            },
         )
+
 
 def optimize(input_path: str, in_params: dict):
     """
@@ -50,11 +58,12 @@ def optimize(input_path: str, in_params: dict):
     """
     data = get_data(input_path)
 
-    for k in range(in_params['min_clusters'], in_params['max_clusters'] + 1, 2):
-        in_params['n_clusters'] = k
+    for k in range(in_params["min_clusters"], in_params["max_clusters"] + 1, 2):
+        in_params["n_clusters"] = k
         cluster_kmeans(data, in_params)
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     args = parse_io_args()
 
     if not args.input_path:
@@ -63,7 +72,7 @@ if __name__=="__main__":
     arg_params = {
         "min_clusters": args.min_clusters,
         "max_clusters": args.max_clusters,
-        "random_state": args.random_state
+        "random_state": args.random_state,
     }
 
     optimize(args.input_path, arg_params)

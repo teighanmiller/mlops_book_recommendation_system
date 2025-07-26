@@ -1,31 +1,41 @@
 """
 Script to create features for embedding
 """
+
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
-from src.utility import get_data, write_data, parse_io_args, check_io_args
+
+from src.utility import check_io_args, get_data, parse_io_args, write_data
+
 
 def create_features(df: pd.DataFrame) -> pd.DataFrame:
     """
     Takes raw data and creates features
     """
     print("Creating Features.....")
-    categorical = "Title: " + df.title \
-                + " Author: " + df.author \
-                + " Description: " + df.description \
-                + " Genres: " + df.genres
-    categorical = pd.DataFrame(categorical, columns=['categorical'])
+    categorical = (
+        "Title: "
+        + df.title
+        + " Author: "
+        + df.author
+        + " Description: "
+        + df.description
+        + " Genres: "
+        + df.genres
+    )
+    categorical = pd.DataFrame(categorical, columns=["categorical"])
 
-    numerical = pd.DataFrame(df[['likedPercent', 'numRatings']])
+    numerical = pd.DataFrame(df[["likedPercent", "numRatings"]])
 
     # scale the numerical features
     scaler = MinMaxScaler()
     scaled_data = scaler.fit_transform(numerical)
-    numerical = pd.DataFrame(scaled_data, columns=['scaled_percent', 'scaled_ratings'])
+    numerical = pd.DataFrame(scaled_data, columns=["scaled_percent", "scaled_ratings"])
 
     data = pd.concat([categorical, numerical], axis=1)
 
     return data
+
 
 def get_features(input_path: str, output_path: str) -> None:
     """
@@ -34,12 +44,15 @@ def get_features(input_path: str, output_path: str) -> None:
     df = get_data(input_path)
 
     feature_df = create_features(df)
-    data = pd.concat([df[['title', 'author', 'description', 'genres']], feature_df], axis=1)
+    data = pd.concat(
+        [df[["title", "author", "description", "genres"]], feature_df], axis=1
+    )
 
     write_data(data, output_path)
     print("Finished.")
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     args = parse_io_args()
 
     check_io_args(args)

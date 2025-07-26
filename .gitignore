@@ -1,1 +1,5 @@
 .env
+mlruns
+mlartifacts
+airflow
+__pycache__

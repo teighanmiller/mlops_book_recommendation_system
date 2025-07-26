@@ -3,34 +3,33 @@
 This is the DAG workflow for data ingestion in the book recommendations system project.
 
 """
-from datetime import timedelta, datetime
-from airflow.sdk import DAG
+
+from datetime import datetime, timedelta
+
 from airflow.providers.standard.operators.bash import BashOperator
+from airflow.sdk import DAG
 
 with DAG(
-    'book-recommendation-system-workflow',
-
+    "book-recommendation-system-workflow",
     default_args={
-    "depends_on_past": False,
-    "retries": 1,
-    "retry_delay": timedelta(minutes=5),
+        "depends_on_past": False,
+        "retries": 1,
+        "retry_delay": timedelta(minutes=5),
     },
-
     description="DAG workflow for cleaning, feature engineering, embeddings, \
         and clustering data for book recommendation system.",
     schedule=timedelta(days=1),
     start_date=datetime(2025, 7, 21),
     catchup=False,
-    tags=["book-recommendation"]
-
+    tags=["book-recommendation"],
 ) as dag:
     clean = BashOperator(
         task_id="data_cleaning",
         bash_command=(
-                "python /opt/airflow/src/clean_data.py "
-                "--output_path s3://books-recommendation-storage/data \
+            "python /opt/airflow/src/clean_data.py "
+            "--output_path s3://books-recommendation-storage/data \
                     /cleaned_{{ ds_nodash }}.parquet"
-            )
+        ),
     )
 
     features = BashOperator(
@@ -39,7 +38,7 @@ with DAG(
             "python /opt/airflow/src/features.py "
             "--input_path s3://books-recommendation-storage/data/cleaned_{{ ds_nodash }}.parquet "
             "--output_path s3://books-recommendation-storage/data/feature_{{ ds_nodash }}.parquet"
-        )
+        ),
     )
 
     embed = BashOperator(
@@ -49,7 +48,7 @@ with DAG(
             "--input_path s3://books-recommendation-storage/data/feature_{{ ds_nodash }}.parquet "
             "--output_path s3://books-recommendation-storage/data/ \
                 embeddings_{{ ds_nodash }}.parquet"
-        )
+        ),
     )
 
-    clean >> features >> embed # pylint: disable=pointless-statement
+    clean >> features >> embed  # pylint: disable=pointless-statement
