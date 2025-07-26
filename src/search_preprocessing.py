@@ -65,7 +65,7 @@ def prepare_corpus(input_file: str, output_file: str):
     print("Removing special characters....")
     msg_corpus.apply(remove_special_characters)
     print("Removing stopword....")
-    msg_corpus.apply(remove_stopwords, nlp)
+    msg_corpus.apply(lambda x: remove_stopwords(x, nlp))
     print("Stemming words....")
     msg_corpus.apply(stem_words)
     print("Tokenizing text....")
@@ -73,7 +73,10 @@ def prepare_corpus(input_file: str, output_file: str):
     tokenized_corpus = tokenize_corpus(msg_corpus)
 
     print("Writing data set....")
-    write_data(pd.DataFrame(tokenized_corpus, columns=["corpus"]), output_file)
+    write_data(
+        tokenized_corpus.to_frame().rename(columns={"categorical": "corpus"}),
+        output_file,
+    )
     print("Finished.")
 
 

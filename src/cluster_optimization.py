@@ -4,14 +4,13 @@ This is the code file for finding the best cluster parameters.
 
 import numpy as np
 import mlflow
-from mlflow.models import infer_signature
 from faiss import Kmeans
 from sklearn.metrics import silhouette_score
 
 from src.utility import get_data, parse_io_args
 
 mlflow.set_tracking_uri("http://localhost:5000")
-mlflow.set_experiment("book_clustering_experiment")
+mlflow.set_experiment("faiss_kmeans_optimization")
 
 
 def cluster_kmeans(data: np.ndarray, in_params: dict):
@@ -35,25 +34,7 @@ def cluster_kmeans(data: np.ndarray, in_params: dict):
         sil_score = silhouette_score(X=data, labels=labels)
 
         mlflow.log_params(params)
-        mlflow.log_metrics("silhouette_score", sil_score)
-
-        signature = infer_signature(data, labels)
-
-        model_info = mlflow.pyfunc.load_model(
-            sk_model=Kmeans,
-            name="book_clustering",
-            signature=signature,
-            input_example=data[:10],
-        )
-
-        mlflow.set_logged_model_tags(
-            model_info.model_id,
-            {
-                "model_type": "fiass-kmeans",
-                "stage": "clustered",
-                "Training Info": "Test Kmeans clustering model for book recommedation system.",
-            },
-        )
+        mlflow.log_metric("silhouette_score", sil_score)
 
 
 def optimize(input_path: str, in_params: dict):

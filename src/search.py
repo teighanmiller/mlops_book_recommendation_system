@@ -13,12 +13,10 @@ def run_search(input_file: str, text: str):
     data = data_df["corpus"].to_list()
     bm25 = BM25Okapi(data)
     query = text.split(" ")
-    scores = bm25.get_scores(query)
 
     books = bm25.get_top_n(query, data, n=10)
-    df_search = data_df[data_df["Text"].isin(books)]
-    print(df_search.head())
-    print(scores)
+    df_search = data_df[data_df["corpus"].isin(books)]
+    return df_search.index
 
 
 if __name__ == "__main__":

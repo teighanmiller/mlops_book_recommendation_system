@@ -3,34 +3,32 @@ Files for model selection and upload
 """
 
 import mlflow
-
-from src.utility import parse_io_args, write_data
+from src.cluster import faiss_cluster
+from src.utility import parse_io_args, check_io_args
 
 mlflow.set_tracking_uri("http://localhost:5000")
-mlflow.set_experiment("book_clustering_experiment")
+mlflow.set_experiment("faiss_kmeans_optimization")
 
 
-def select_model(output_path: str):
+def select_model(input_path: str, output_path: str):
     """
     Seaches mlflow logs for best cluster model and uploads it.
     """
-    best_model = mlflow.search_logged_models(
-        experiment_ids=["1"],
-        filter_string="metrics.silhouette_score > 0.70",
+    best_run = mlflow.search_runs(
+        experiment_names=["faiss_kmeans_optimization"],
+        order_by=["metrics.silhouette_score DESC"],
         max_results=1,
-        order_by=[{"field_name": "metrics.silhouette_score", "ascending": False}],
-        output_format="list",
-    )[0]
+    )
 
-    loaded_model = mlflow.pyfunc.load_model(f"models:/{best_model.model_id}")
+    best_params = best_run.iloc[0].filter(like="params.").to_dict()
+    best_params = {k.replace("params.", ""): int(v) for k, v in best_params.items()}
 
-    write_data(loaded_model, output_path)
+    faiss_cluster(input_path, output_path, **best_params)
 
 
 if __name__ == "__main__":
     args = parse_io_args()
 
-    if not args.output_path:
-        raise ValueError("You must provide --output_path")
+    check_io_args(args)
 
-    select_model(args.output_path)
+    select_model(args.input_path, args.output_path)
