@@ -92,14 +92,14 @@ def parse_io_args():
         "--min_clusters",
         "-m",
         type=int,
-        default=2,
+        default=100,
         help="minimum number of clusters to check",
     )
     parser.add_argument(
         "--max_clusters",
         "-x",
         type=int,
-        default=50,
+        default=200,
         help="maximum number of clusters to check",
     )
     parser.add_argument(
