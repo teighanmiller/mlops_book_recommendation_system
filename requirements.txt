@@ -15,3 +15,4 @@ pylint
 black
 pytest
 pre-commit
+faiss-cpu
