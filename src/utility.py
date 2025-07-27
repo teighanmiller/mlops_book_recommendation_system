@@ -4,6 +4,7 @@ Utility functions for the mlops book recommendation system
 
 import argparse
 from io import BytesIO
+import numpy as np
 
 import boto3
 import botocore.exceptions
@@ -121,3 +122,13 @@ def check_io_args(args):
 
     if not args.output_path:
         raise ValueError("You must provide --ouput_path")
+
+
+def isolate_embeddings(df: pd.DataFrame) -> np.ndarray:
+    """
+    Remove all metadata from embedding dataframe
+    """
+    embeddings = df.drop(
+        columns=["title", "author", "description", "genres"]
+    ).to_numpy()
+    return embeddings

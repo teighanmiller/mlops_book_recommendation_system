@@ -2,7 +2,11 @@
 Files for model selection and upload
 """
 
+from datetime import date, timedelta
 import mlflow
+import numpy as np
+import pandas as pd
+from kneed import KneeLocator
 from src.cluster import faiss_cluster
 from src.utility import parse_io_args, check_io_args
 
@@ -14,16 +18,46 @@ def select_model(input_path: str, output_path: str):
     """
     Seaches mlflow logs for best cluster model and uploads it.
     """
-    best_run = mlflow.search_runs(
+
+    models = mlflow.search_runs(
         experiment_names=["faiss_kmeans_optimization"],
-        order_by=["metrics.silhouette_score DESC"],
-        max_results=1,
+        output_format="pandas",
+        max_results=200,
     )
 
-    best_params = best_run.iloc[0].filter(like="params.").to_dict()
-    best_params = {k.replace("params.", ""): int(v) for k, v in best_params.items()}
+    daily_models = pd.DataFrame(columns=models.columns)
+    check_date = date.today()
+    cut_date = date.today() - timedelta(days=20)
+    while daily_models.empty and cut_date < check_date:
+        daily_models = models[models["tags.run_group_id"] == check_date.isoformat()]
+        check_date -= timedelta(days=1)
 
-    faiss_cluster(input_path, output_path, **best_params)
+    if daily_models.empty:
+        raise ValueError(f"Could not find models after {cut_date}")
+
+    metrics = daily_models[["params.k", "metrics.inertia"]]
+
+    k_list = sorted(np.array(metrics["params.k"].to_list(), dtype=int))
+    inertias_list = sorted(np.array(metrics["metrics.inertia"].to_list(), dtype=int))
+
+    kn = KneeLocator(k_list, inertias_list, curve="concave", direction="increasing")
+
+    best_model = daily_models[pd.to_numeric(daily_models["params.k"]) == int(kn.knee)]
+
+    if len(best_model) > 1:
+        best_model = best_model.iloc[0]
+    elif len(best_model) < 1:
+        raise ValueError("Best model not found.")
+
+    params = {
+        "d": int(pd.to_numeric(best_model["params.d"]).iloc[0]),
+        "k": int(pd.to_numeric(best_model["params.k"]).iloc[0]),
+        "niter": int(pd.to_numeric(best_model["params.niter"]).iloc[0]),
+        "verbose": bool(best_model["params.verbose"].iloc[0]),
+        "spherical": bool(best_model["params.spherical"].iloc[0]),
+    }
+
+    faiss_cluster(input_path, output_path, params)
 
 
 if __name__ == "__main__":
