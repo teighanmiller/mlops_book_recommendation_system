@@ -6,7 +6,7 @@ import pandas as pd
 import nltk
 import spacy
 from nltk.stem import PorterStemmer
-from utility import get_data, write_data, parse_io_args, check_io_args
+from src.utility import get_data, write_data, parse_io_args, check_io_args
 
 
 def remove_special_characters(text: str):

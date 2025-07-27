@@ -3,8 +3,8 @@ Backend for book recommendation application
 """
 from flask import Flask, request, render_template, session
 from flask_session import Session
-from search import run_search
-from utility import get_data
+from src.search import run_search
+from src.utility import get_data
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "your_secret_key_here"

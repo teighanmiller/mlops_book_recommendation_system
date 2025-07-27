@@ -2,7 +2,7 @@
 Workflow for searching database for specific books
 """
 from rank_bm25 import BM25Okapi
-from utility import get_data, parse_io_args
+from src.utility import get_data, parse_io_args
 
 
 def run_search(input_file: str, text: str):
