@@ -7,13 +7,6 @@ repos:
     -   id: trailing-whitespace
         files: ^(src/|tests/|dags/)
 
--   repo: https://github.com/psf/black
-    rev: 22.10.0
-    hooks:
-    -   id: black
-        args: [--quiet]
-        files: ^(src/|tests/|dags/)
-
 -   repo: local
     hooks:
     -   id: pylint
