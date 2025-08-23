@@ -1,14 +1,19 @@
+LOCAL_TAG:=$(shell date + "%Y-%m-%d-%H-%M")
+LOCAL_IMAGE_NAME:=stream-model-duration:${LOCAL_TAG}
+
 test:
 	pytest tests/
-
-integration_test: test
-	bash integration_test/run.sh
 
 quality_checks:
 	isort .
 	black .
 	pylint --recursive=y src dags tests
 
+build: quality_checks tests
+	docker build -t ${LOCAL_IMAGE_NAME} .
 
-run: quality_checks test integration_test
-	echo run
+integration_test: build
+	LOCAL_IMAGE_NAME=${LOCAL_IMAGE_NAME} bash integration_test/run.sh
+
+publish: build
+	bash publish.sh
