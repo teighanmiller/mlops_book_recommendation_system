@@ -12,11 +12,8 @@
 3. [What’s Built So Far](#whats-built-so-far)  
 4. [Areas Under Development / Planned Improvements](#areas-under-development--planned-improvements)  
 5. [Tech Stack & Architecture](#tech-stack--architecture)  
-6. [How to Run / Use It](#how-to-run--use-it)  
-7. [Testing, Monitoring & MLOps Practices](#testing-monitoring--mlops-practices)  
-8. [Why This Project Matters](#why-this-project-matters)  
-9. [Contribution Opportunities](#contribution-opportunities)  
-10. [Contact](#contact)
+6. [Development Status & Limitations]
+7. [Contact](#contact)
 
 ---
 
