@@ -12,7 +12,7 @@
 3. [What’s Built So Far](#whats-built-so-far)  
 4. [Areas Under Development / Planned Improvements](#areas-under-development--planned-improvements)  
 5. [Tech Stack & Architecture](#tech-stack--architecture)  
-6. [Development Status & Limitations]
+6. [Development Status & Limitations](#development-status--limitations)
 7. [Contact](#contact)
 
 ---
